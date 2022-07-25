@@ -72,21 +72,25 @@ public class IngredientController {
   @GetMapping("recipe/{recipeId}/ingredient/{id}/update")
   public String updateRecipeIngredient(
       @PathVariable String recipeId, @PathVariable String id, Model model) {
-    model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, id));
+    final IngredientCommand ingredient =
+        ingredientService.findByRecipeIdAndIngredientId(recipeId, id);
+    log.debug("ingredient: {}", ingredient);
 
+    model.addAttribute("ingredient", ingredient);
     model.addAttribute("uomList", unitOfMeasureService.listAllUoms());
     return "recipe/ingredient/ingredientform";
   }
 
   @PostMapping("recipe/{recipeId}/ingredient")
   public String saveOrUpdate(@ModelAttribute IngredientCommand command) {
+    log.debug("command: {}", command);
     IngredientCommand savedCommand = ingredientService.saveIngredientCommand(command);
 
     log.debug("saved receipe id:" + savedCommand.getRecipeId());
     log.debug("saved ingredient id:" + savedCommand.getId());
 
     return "redirect:/recipe/"
-        + savedCommand.getRecipeId()
+        + command.getRecipeId()
         + "/ingredient/"
         + savedCommand.getId()
         + "/show";
